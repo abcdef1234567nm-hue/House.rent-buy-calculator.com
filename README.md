@@ -1,1 +1,92 @@
 # House.rent-buy-calculator.com
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rent vs Buy Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f7fb; margin:0; padding:20px; }
+    .container { max-width:800px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,.1); }
+    h1 { text-align:center; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:15px; }
+    label { font-weight:bold; font-size:14px; }
+    input { width:100%; padding:10px; margin-top:5px; border-radius:8px; border:1px solid #ccc; }
+    button { margin-top:20px; width:100%; padding:12px; font-size:16px; border:none; border-radius:10px; cursor:pointer; background:#4f46e5; color:#fff; }
+    button:hover { background:#4338ca; }
+    .result { margin-top:25px; padding:15px; border-radius:10px; background:#f0fdf4; font-size:16px; }
+    .note { margin-top:10px; font-size:13px; color:#555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏠 Rent vs Buy Calculator</h1>
+
+    <div class="grid">
+      <div>
+        <label>Monthly Rent (₹)</label>
+        <input id="rent" type="number" placeholder="15000" />
+      </div>
+      <div>
+        <label>Home Price (₹)</label>
+        <input id="price" type="number" placeholder="5000000" />
+      </div>
+      <div>
+        <label>Down Payment (%)</label>
+        <input id="down" type="number" placeholder="20" />
+      </div>
+      <div>
+        <label>Home Loan Interest (%)</label>
+        <input id="interest" type="number" placeholder="8.5" />
+      </div>
+      <div>
+        <label>Loan Tenure (Years)</label>
+        <input id="years" type="number" placeholder="20" />
+      </div>
+      <div>
+        <label>Annual Home Appreciation (%)</label>
+        <input id="appreciation" type="number" placeholder="5" />
+      </div>
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="output" class="result" style="display:none"></div>
+    <div class="note">*This is an estimate. Actual costs may vary by city.</div>
+  </div>
+
+<script>
+function calculate() {
+  const rent = +document.getElementById('rent').value * 12;
+  const price = +document.getElementById('price').value;
+  const down = +document.getElementById('down').value / 100;
+  const interest = +document.getElementById('interest').value / 100 / 12;
+  const years = +document.getElementById('years').value * 12;
+  const appreciation = +document.getElementById('appreciation').value / 100;
+
+  if (!rent || !price || !years) return alert('Please fill all fields');
+
+  const loanAmount = price * (1 - down);
+  const emi = loanAmount * interest * Math.pow(1 + interest, years) / (Math.pow(1 + interest, years) - 1);
+  const totalBuyCost = emi * years;
+
+  const futureValue = price * Math.pow(1 + appreciation, years / 12);
+
+  let result = '';
+  if (rent * (years / 12) < totalBuyCost - futureValue) {
+    result = '📌 Renting is financially better for you.';
+  } else {
+    result = '📌 Buying a home is financially better for you.';
+  }
+
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('output').innerHTML = `
+    <strong>${result}</strong><br><br>
+    🧮 Monthly EMI: ₹${emi.toFixed(0)}<br>
+    💰 Total Rent Paid: ₹${(rent * (years/12)).toFixed(0)}<br>
+    🏡 Home Value After ${years/12} Years: ₹${futureValue.toFixed(0)}
+  `;
+}
+</script>
+</body>
+</html>
